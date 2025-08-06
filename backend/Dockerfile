@@ -3,7 +3,9 @@ FROM php:8.2-fpm
 # Establece el directorio de trabajo dentro del contenedor
 WORKDIR /var/www
 
-
+# Instalar extensiones de PHP y dependencias del sistema necesarias
+# Incluye libpq-dev para PostgreSQL, git, curl, y las extensiones de PHP
+# También añade nodejs y npm para el frontend
 RUN apt-get update && apt-get install -y \
     libzip-dev \
     zip \
@@ -34,21 +36,19 @@ RUN composer install --no-interaction --prefer-dist --optimize-autoloader --no-d
 # Esto ejecutará 'npm install' y luego 'npm run build' según tu package.json
 RUN npm install && npm run build
 
-# Ejecutar las migraciones de la base de datos
-# El --force es necesario para ejecutar migraciones en entornos no interactivos
-RUN php artisan migrate --force
-
 # Optimizar la configuración y las rutas de Laravel para producción
 RUN php artisan optimize
 
 # Crear el enlace simbólico para el almacenamiento público
 RUN php artisan storage:link
 
-# Dar permisos adecuados a los directorios de Laravel
+# Dar permisos adecuados a los directorios de almacenamiento y caché
 RUN chown -R www-data:www-data /var/www/storage /var/www/bootstrap/cache
 
-# Railway 
+# Exponer el puerto por defecto de PHP-FPM
+# Railway redirigirá el tráfico web a este puerto
 EXPOSE 9000
 
 # Comando para iniciar PHP-FPM cuando el contenedor se ejecute
+# Las migraciones se ejecutarán en el "Start Command" de Railway
 CMD ["php-fpm"]
