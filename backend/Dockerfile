@@ -42,7 +42,7 @@ RUN php artisan optimize
 # Crear el enlace simbólico para el almacenamiento público
 RUN php artisan storage:link
 
-RUN php artisan migrate
+
 # Dar permisos adecuados a los directorios de almacenamiento y caché
 RUN chown -R www-data:www-data /var/www/storage /var/www/bootstrap/cache
 
