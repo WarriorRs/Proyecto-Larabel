@@ -2,7 +2,6 @@
 FROM php:8.2-fpm
 
 # Establece el directorio de trabajo dentro del contenedor
-# Esto será la raíz de tu proyecto Laravel
 WORKDIR /var/www/backend
 
 # Instalar dependencias del sistema y extensiones de PHP
@@ -25,16 +24,19 @@ RUN docker-php-ext-install pdo pdo_pgsql
 # Instalar Composer
 RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
 
-# Copiar proyecto Laravel al contenedor
+# Copiar todo el proyecto al contenedor
 COPY . /var/www/backend
 
-# Instalar dependencias de Composer (PHP)
+# Copia el script de entrada y dale permisos de ejecución
+COPY entrypoint.sh /usr/local/bin/entrypoint.sh
+RUN chmod +x /usr/local/bin/entrypoint.sh
+
+# Instalar dependencias de Composer (PHP) y de Node.js
 RUN composer install --no-interaction --prefer-dist --optimize-autoloader
+RUN npm install
 
-# Instalar dependencias de Node.js y compilar el frontend (Vue)
-RUN npm install && npm run build
-
-# Optimizar la configuración y las rutas de Laravel para producción
+# Compilar el frontend (Vue) y optimizar Laravel
+RUN npm run build
 RUN php artisan optimize
 
 # Crear el enlace simbólico para el almacenamiento público
@@ -47,4 +49,4 @@ RUN chown -R www-data:www-data /var/www/backend/storage /var/www/backend/bootstr
 EXPOSE 9000
 
 # Comando para iniciar PHP-FPM
-CMD ["php-fpm"]
+CMD ["entrypoint.sh"]
