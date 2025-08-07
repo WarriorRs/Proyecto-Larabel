@@ -3,21 +3,15 @@ services:
     build:
       context: ./backend
     container_name: app
-    # Ajusta el volumen para que coincida con el WORKDIR del Dockerfile
     volumes:
       - ./backend:/var/www/backend
     working_dir: /var/www/backend
-    # Quita el mapeo de puertos 8000:8000, Nginx lo hará por ti
-    # ports:
-    #  - "8000:8000"
     expose:
       - "9000"
     depends_on:
       - db
     networks:
       - app-network
-    # ELIMINA ESTA LÍNEA para que se use el CMD del Dockerfile
-    # command: php-fpm
 
   frontend:
     build: ./frontend

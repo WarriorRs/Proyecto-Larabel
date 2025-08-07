@@ -24,7 +24,7 @@ RUN docker-php-ext-install pdo pdo_pgsql
 # Instalar Composer
 RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
 
-# Copiar todo el proyecto al contenedor
+# Copiar el proyecto completo al contenedor
 COPY . /var/www/backend
 
 # Copia el script de entrada y dale permisos de ejecución
@@ -48,5 +48,5 @@ RUN chown -R www-data:www-data /var/www/backend/storage /var/www/backend/bootstr
 # Exponer el puerto por defecto de PHP-FPM
 EXPOSE 9000
 
-# Comando para iniciar PHP-FPM
+# El comando de entrada que ejecuta tu script
 CMD ["entrypoint.sh"]
